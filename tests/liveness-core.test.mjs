@@ -23,6 +23,14 @@ expired('We’re sorry… the job you are trying to apply for has been filled. A
   ? pass('Phenom/ICF "the job ... has been filled" -> expired (was: active)')
   : fail('Phenom/ICF "the job ... has been filled" NOT classified expired');
 
+// Thales's French Phenom shell says "L’emploi pour lequel vous essayez de
+// postuler a été pourvu." — the job noun and the closure verb are separated by
+// a clause, so the short French pattern did not fire.
+expired('Nous sommes désolés… L’emploi pour lequel vous essayez de postuler a été pourvu. Apply')
+  === 'expired'
+  ? pass('Thales/Phenom FR "emploi ... a été pourvu" -> expired')
+  : fail('Thales/Phenom FR "emploi ... a été pourvu" NOT classified expired');
+
 // Regression: the original phrasing still classifies as expired.
 expired('This position has been filled. Apply') === 'expired'
   ? pass('"position has been filled" still -> expired')

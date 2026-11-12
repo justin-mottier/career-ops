@@ -90,6 +90,10 @@ const HARD_EXPIRED_PATTERNS = [
   /offre (expiree|n'est plus disponible)/i,
   /(cette )?offre n'est plus (disponible|en ligne|active)/i,
   /(offre|poste|annonce) (deja )?pourvu(e)?/i,
+  // Thales/Phenom renders "L'emploi pour lequel vous essayez de postuler a été
+  // pourvu." — the short form above stops at the first noun and misses the
+  // intervening clause, so allow a short bridge after it.
+  /\b(emploi|poste|offre|annonce|job)\b[\s\S]{0,80}?\ba ete pourvu(e)?\b/i,
   /offre (cloturee|desactivee|terminee)/i,
   /ce poste n'est plus (disponible|a pourvoir|ouvert)/i,
   /recrutement (termine|cloture)/i,
