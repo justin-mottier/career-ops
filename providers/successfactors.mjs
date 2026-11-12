@@ -212,12 +212,17 @@ export function parseTiles(htmlText, jobBase) {
     // data-url is an HTML attribute, so a literal "&" in the path arrives as
     // &amp;. Decode entities (but not percent-encoding — %28 etc. stays) before
     // both URL building and slug parsing, so the "amp" of &amp; can't leak into
-    // the recovered city.
-    const path = decodeEntities(urlM[1]);
-    // Anchor on id="…-section-city-value"> — the value div. The sibling label
-    // span references the same id via aria-describedby, so a looser match would
-    // swallow the "City" label text too.
-    const cityM = block.match(/id="[^"]*-section-city-value">([\s\S]*?)<\/div>/);
+    // the recovered city. Bonduelle ships the apostrophe double-escaped
+    // (&amp;apos;), so one decode leaves a literal &apos; in the href; finish
+    // that specific entity off without a second generic pass (which would
+    // over-decode a legitimate &amp; path segment).
+    const path = decodeEntities(urlM[1]).replace(/&apos;/g, "'");
+    // Anchor on id="…-section-city-value"> — the value div. Some tenants (e.g.
+    // Bonduelle) render the same value under -section-location-value instead,
+    // with no city field at all; fall back to that before slug recovery so an
+    // apostrophe in the city name can't degrade into "Villeneuve D Apos Ascq".
+    const cityM = block.match(/id="[^"]*-section-city-value">([\s\S]*?)<\/div>/)
+      || block.match(/id="[^"]*-section-location-value">([\s\S]*?)<\/div>/);
     const city = cityM ? clean(cityM[1]) : cityFromSlug(path, title);
     const url = /^https?:\/\//i.test(path) ? path : jobBase + (path.startsWith('/') ? path : '/' + path);
     out.push({ id, title, url, location: city });
